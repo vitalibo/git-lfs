@@ -38,13 +38,21 @@ configure:
 init:
 	$(TF_ENV_VARS) terraform init $(TF_OPTIONS) $(TF_INIT_CONF)
 
+.PHONY: package
+package:
+	rm -rf $(CURDIR)/function_source.zip
+	for module in 'core' 'aws' ; do \
+		cd $(CURDIR)/../../git-lfs-$$module/src/main/ ; \
+		zip -r $(CURDIR)/function_source.zip ./ ; \
+	done
+
 .PHONY: plan
-plan: configure init
+plan: configure init package
 	$(TF_ENV_VARS) terraform plan $(TF_OPTIONS) $(TF_RUN_CONF)
 
 .PHONY: apply
-apply: configure init
-	@echo $(TF_ENV_VARS) terraform apply $(TF_OPTIONS) $(TF_RUN_CONF)
+apply: configure init package
+	$(TF_ENV_VARS) terraform apply $(TF_OPTIONS) $(TF_RUN_CONF)
 
 .PHONY: destroy
 destroy: configure init
