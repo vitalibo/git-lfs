@@ -1,0 +1,14 @@
+{
+  "isBase64Encoded": true,
+  "statusCode": 200,
+  "headers": {
+    "Cache-Control": "max-age=60"
+  },
+  "multiValueHeaders": {
+    "multiValueName": [
+      "you",
+      "me"
+    ]
+  },
+  "body": "{\"message\": \"Hello World!\"}"
+}

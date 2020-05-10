@@ -26,6 +26,12 @@ resource "aws_lambda_function" "lambda" {
   memory_size      = 128
   timeout          = 30
   tags             = var.tags
+
+  environment {
+    variables = {
+      LOG_LEVEL = "DEBUG"
+    }
+  }
 }
 
 data "aws_iam_policy_document" "lambda_role_trust_policy" {
