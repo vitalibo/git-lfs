@@ -29,7 +29,8 @@ resource "aws_lambda_function" "lambda" {
 
   environment {
     variables = {
-      LOG_LEVEL = "DEBUG"
+      LOG_LEVEL      = "INFO"
+      S3_BUCKET_NAME = var.bucket_name
     }
   }
 }
@@ -61,8 +62,9 @@ data "aws_iam_policy_document" "lambda_role_policy" {
     effect = "Allow"
 
     actions = [
-      "s3:GetObject*",
-      "s3:PutObject*"
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
     ]
 
     resources = [
