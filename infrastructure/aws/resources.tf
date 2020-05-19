@@ -21,7 +21,7 @@ resource "aws_lambda_function" "lambda" {
   filename         = data.local_file.lambda_source.filename
   source_code_hash = filebase64sha256(data.local_file.lambda_source.filename)
   role             = aws_iam_role.lambda_role.arn
-  handler          = "aws.function.handler"
+  handler          = "aws.lambda_handler"
   runtime          = "python3.7"
   memory_size      = 128
   timeout          = 30
