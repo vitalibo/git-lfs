@@ -42,10 +42,19 @@ init:
 package:
 	rm -rf $(CURDIR)/function_source.zip
 	for module in 'core' 'azure' ; do \
-		cd $(CURDIR)/../../git-lfs-$$module/src/ ; \
-		zip -r $(CURDIR)/function_source.zip ./main/ ; \
+  		module_dir=$(CURDIR)/../../git-lfs-$$module ; \
+  		\
+		cd $$module_dir/src/main/ ; \
+		zip -r $(CURDIR)/function_source.zip ./ ; \
+		\
+		cd $$module_dir ; \
+		rm -rf .python_packages ; \
+		docker run -v `pwd`:/mnt/ --entrypoint '/bin/bash' \
+			mcr.microsoft.com/azure-functions/python:2.0-python3.7-appservice -c \
+			"pip install -r /mnt/requirements.txt -t /mnt/.python_packages/lib/site-packages" ; \
+		zip -r $(CURDIR)/function_source.zip .python_packages/lib/site-packages ; \
+		rm -rf .python_packages ; \
 	done
-	cd $(CURDIR)/../../git-lfs-azure/ && zip -r $(CURDIR)/function_source.zip host.json requirements.txt
 
 .PHONY: plan
 plan: configure init package

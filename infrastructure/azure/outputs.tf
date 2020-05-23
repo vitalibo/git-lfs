@@ -30,5 +30,5 @@ output "function_app_name" {
 
 output "function_app_endpoint" {
   description = "The endpoint of the Function App"
-  value       = "https://${azurerm_function_app.function_app.default_hostname}/api/main/"
+  value       = "https://${azurerm_function_app.function_app.default_hostname}/api/"
 }

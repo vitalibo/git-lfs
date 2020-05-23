@@ -14,10 +14,6 @@ resource "azurerm_resource_group" "resource_group" {
   tags     = var.tags
 }
 
-data "local_file" "function_source" {
-  filename = "${path.module}/function_source.zip"
-}
-
 resource "azurerm_storage_account" "storage_account" {
   name                     = replace("${local.resource_name_prefix}-sa", "-", "")
   resource_group_name      = azurerm_resource_group.resource_group.name
@@ -28,15 +24,21 @@ resource "azurerm_storage_account" "storage_account" {
 }
 
 resource "azurerm_storage_container" "storage_container" {
-  name                  = "${local.resource_name_prefix}-sac"
+  name                  = "${var.name}-storage"
+  storage_account_name  = azurerm_storage_account.storage_account.name
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_container" "deployment_container" {
+  name                  = "azure-webjobs-deployments"
   storage_account_name  = azurerm_storage_account.storage_account.name
   container_access_type = "private"
 }
 
 resource "azurerm_storage_blob" "function_source_code" {
-  name                   = filebase64sha256(data.local_file.function_source.filename)
+  name                   = filesha256("${path.module}/function_source.zip")
   storage_account_name   = azurerm_storage_account.storage_account.name
-  storage_container_name = azurerm_storage_container.storage_container.name
+  storage_container_name = azurerm_storage_container.deployment_container.name
   type                   = "Block"
   source                 = "${path.module}/function_source.zip"
 }
@@ -44,8 +46,8 @@ resource "azurerm_storage_blob" "function_source_code" {
 data "azurerm_storage_account_sas" "storage_account_sas" {
   connection_string = azurerm_storage_account.storage_account.primary_connection_string
   https_only        = true
-  start             = "2019-01-01"
-  expiry            = "2021-12-31"
+  start             = "2020-01-01"
+  expiry            = "2022-12-31"
 
   resource_types {
     object    = true
@@ -109,6 +111,9 @@ resource "azurerm_function_app" "function_app" {
     FUNCTIONS_EXTENSION_VERSION    = "~3"
     APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.application_insights.instrumentation_key
     WEBSITE_RUN_FROM_PACKAGE       = "${azurerm_storage_blob.function_source_code.url}${data.azurerm_storage_account_sas.storage_account_sas.sas}"
+    STORAGE_ACCOUNT                = azurerm_storage_account.storage_account.name
+    STORAGE_ACCOUNT_PRIMARY_KEY    = azurerm_storage_account.storage_account.primary_access_key
+    STORAGE_CONTAINER              = azurerm_storage_container.storage_container.name
     LOG_LEVEL                      = "INFO"
   }
 
