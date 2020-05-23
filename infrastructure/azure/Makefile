@@ -1,5 +1,5 @@
 environment := dev
-profile := default
+subscription_id :=
 auto-approve := false
 
 ENVIRONMENTS := $(shell find ./vars -type f -name '*.tfvars' | cut -c 8- | rev | cut -c 8- | rev | paste -sd " " - | xargs)
@@ -11,11 +11,11 @@ TF_RUN_CONF :=
 
 .PHONY: help
 help:
-	@echo "Usage: make <plan|apply|destroy> provider=azure environment=<string> profile=<string> auto-approve=<true|false>"
+	@echo "Usage: make <plan|apply|destroy> provider=azure environment=<string> subscription_id=<string> auto-approve=<true|false>"
 	@echo " "
 	@echo "Options:"
 	@echo "  environment      The terraform input variables file name (Supported values: [$(ENVIRONMENTS)])."
-	@echo "  profile          Use a specific Azure profile from your credential file (Default: 'default')."
+	@echo "  subscription_id  Use a specific Subscription ID which should be used."
 	@echo "  auto-approve     Skip interactive approval of plan before applying (Default: 'false')."
 	@echo " "
 
@@ -25,7 +25,7 @@ configure:
     endif
     TF_ENV_VARS := TF_DATA_DIR="$(CURDIR)/.terraform/$(environment)"
     TF_OPTIONS := $(TF_OPTIONS) -var="environment=$(environment)"
-    TF_OPTIONS := $(TF_OPTIONS) -var="profile=$(profile)"
+    TF_OPTIONS := $(TF_OPTIONS) -var="subscription_id=$(subscription_id)"
     TF_INIT_CONF := $(TF_INIT_CONF) -backend-config="$(CURDIR)/states/$(environment).tfstate"
     TF_INIT_CONF := $(TF_INIT_CONF) -var-file="$(CURDIR)/vars/$(environment).tfvars"
     TF_RUN_CONF := $(TF_RUN_CONF) -state="$(CURDIR)/states/$(environment).tfstate"
@@ -38,13 +38,22 @@ configure:
 init:
 	$(TF_ENV_VARS) terraform init $(TF_OPTIONS) $(TF_INIT_CONF)
 
+.PHONY: package
+package:
+	rm -rf $(CURDIR)/function_source.zip
+	for module in 'core' 'azure' ; do \
+		cd $(CURDIR)/../../git-lfs-$$module/src/ ; \
+		zip -r $(CURDIR)/function_source.zip ./main/ ; \
+	done
+	cd $(CURDIR)/../../git-lfs-azure/ && zip -r $(CURDIR)/function_source.zip host.json requirements.txt
+
 .PHONY: plan
-plan: configure init
+plan: configure init package
 	$(TF_ENV_VARS) terraform plan $(TF_OPTIONS) $(TF_RUN_CONF)
 
 .PHONY: apply
-apply: configure init
-	@echo $(TF_ENV_VARS) terraform apply $(TF_OPTIONS) $(TF_RUN_CONF)
+apply: configure init package
+	$(TF_ENV_VARS) terraform apply $(TF_OPTIONS) $(TF_RUN_CONF)
 
 .PHONY: destroy
 destroy: configure init
