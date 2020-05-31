@@ -30,5 +30,82 @@ When user push/pull (1) changes Git LFS client make Batch API request (2) over H
 In function for each LFS object generated (3) shared access signature (SAS) URL for temporary write/read access to Azure Blob Storage.
 After received (4) response Git LFS client make uploading (5) / downloading (6) objects to/from Azure Blob Storage using SAS URL.
 
-## Usage
+## Instructions
 
+### Deploy
+
+The deployment of Git LFS is fully based on terraform templates.
+First of all you will need to install [terraform client](https://learn.hashicorp.com/terraform/getting-started/install.html).
+To deploy Git LFS server you need go to `infrastructure` folder and invoke the appropriate commands for your infrastructure provider.
+
+#### AWS
+
+To get started with AWS you need to create an [AWS account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/) and configure [AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html).
+
+```bash
+aws configure --profile default
+```
+
+After these steps you need create `aws/vars/<name>.tfvars` file with correct for you input variables.
+Now you ready to create necessary resources, please invoke following command.
+
+```bash
+make apply provider=aws environment=dev profile=default auto-approve=true
+```
+
+After successful deployment output property `api_gateway_endpoint` contains your Git LFS server endpoint URL.
+
+#### Azure
+
+To get started with Azure you need to create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and configure [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+
+```bash
+az login
+```
+
+After these steps you need create `azure/vars/<name>.tfvars` file with correct for you input variables.
+Now you ready to create necessary resources, please invoke following command.
+
+```bash
+make apply provider=azure environment=dev subscription_id=b4a47026-a2bd-11ea-bb37-0242ac130002 auto-approve=true
+```
+
+After successful deployment output property `function_app_endpoint` contains your Git LFS server endpoint URL.
+
+### Usage
+
+To use custom a Git LFS server you need perform steps described in a section [deploy](#Deploy).
+
+Create `.lfsconfig` file in the root of your project repository and replace the endpoint url with correct for you value (see terraform output of deploying infrastructure).
+
+```
+[lfs]
+url = htts://example.gitlfs.com/api/v1/
+```
+
+To associate a file type with Git LFS server, create `.gitattributes` in the root of your project repository and add your types as shown in the below example.
+
+```
+*.pdf filter=lfs diff=lfs merge=lfs -text
+```
+
+Commit `.lfsconfig` and `.gitattributes` files and push it to origin.
+
+```bash
+git add .lfsconfig .gitattributes
+git commit -m 'Configure Git LFS server'
+git push origin
+``` 
+
+Now you are ready to use Git LFS custom server.
+To test it, commit `progit.pdf` binary file.
+
+```bash
+git add progit.pdf
+git commit -m 'Add book Pro Git [Scott Chacon, Ben Straub]'
+git push origin
+```
+
+After a successful commit, clone project to another location or another computer to confirm you can read the files.
+
+All steps described here available in example that located in the `integration` folder.
