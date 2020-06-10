@@ -30,6 +30,17 @@ When user push/pull (1) changes Git LFS client make Batch API request (2) over H
 In function for each LFS object generated (3) shared access signature (SAS) URL for temporary write/read access to Azure Blob Storage.
 After received (4) response Git LFS client make uploading (5) / downloading (6) objects to/from Azure Blob Storage using SAS URL.
 
+### Self-Hosted
+
+Module self-hosted allows you to use external hard driver for storing large files.
+Module use Docker + Flask web-server for deploying service on the self-managed server, also you can run service locally.
+
+![architecture](https://app.lucidchart.com/publicSegments/view/aec92441-cb88-4283-a359-2402b786e5b1/image.png)
+
+When user push/pull (1) changes Git LFS client make Batch API request (2) over HTTP(S) to batch endpoint.
+This endpoint return (3) transfer api endpoint for write/read access for each lfs object.
+After receiving the response client make a request (4) to transfer endpoint, that redirect write/read (5) request to external hard drive and response returned back (6) to a client.
+
 ## Instructions
 
 ### Deploy
@@ -71,6 +82,17 @@ make apply provider=azure environment=dev subscription_id=b4a47026-a2bd-11ea-bb3
 ```
 
 After successful deployment output property `function_app_endpoint` contains your Git LFS server endpoint URL.
+
+#### Self-Hosted
+
+To get started with self-hosted you need to install [Docker](https://docs.docker.com/get-docker/) engine.
+After that you need create `aws/vars/<name>.tfvars` file with correct for you input variables.
+Now you ready to create necessary resources, please invoke following command.
+
+```bash
+make apply provider=self environment=dev auto-approve=true
+```
+After successful deployment output property `endpoint` contains your Git LFS server endpoint URL.
 
 ### Usage
 
