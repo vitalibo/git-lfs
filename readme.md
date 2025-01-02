@@ -12,7 +12,7 @@ Module AWS allows you to use [Amazon S3](https://aws.amazon.com/s3/) as remote s
 Service is deployable on a serverless stack (API Gateway + Lambda) that allows you to use Pay-As-You-Go (PAYG) pricing model.
 The high-level solution diagram you can find below.
 
-![architecture](https://fwtbbmf399.execute-api.us-east-1.amazonaws.com/Prod/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=aws.svg)
+![architecture](https://markdown-inline-svg.vitalibo.click/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=aws.svg)
 
 <details> 
 <summary>SVG code</summary>
@@ -35,7 +35,7 @@ Now Git LFS client ready for uploading (6) / downloading (7) objects to/from S3 
 Module Azure allows you to use [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/) service as remote storage for large files.
 Azure Functions serverless computing platform is taken as a basis for deploying Git LFS application.
 
-![architecture](https://fwtbbmf399.execute-api.us-east-1.amazonaws.com/Prod/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=azure.svg)
+![architecture](https://markdown-inline-svg.vitalibo.click/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=azure.svg)
 
 <details> 
 <summary>SVG code</summary>
@@ -57,7 +57,7 @@ After received (4) response Git LFS client make uploading (5) / downloading (6) 
 Module GCP allow you to use [Cloud Storage](https://cloud.google.com/storage) service as remote storage for large files.
 Application code is running on serverless stacks, namely use Cloud Functions computing engine.
 
-![architecture](https://fwtbbmf399.execute-api.us-east-1.amazonaws.com/Prod/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=gcp.svg)
+![architecture](https://markdown-inline-svg.vitalibo.click/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=gcp.svg)
 
 <details> 
 <summary>SVG code</summary>
@@ -79,7 +79,7 @@ After received response Git LFS client make uploading (4) / downloading (5) obje
 Module self-hosted allows you to use external hard driver for storing large files.
 Module use Docker + Flask web-server for deploying service on the self-managed server, also you can run service locally.
 
-![architecture](https://fwtbbmf399.execute-api.us-east-1.amazonaws.com/Prod/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=self.svg)
+![architecture](https://markdown-inline-svg.vitalibo.click/svg?source=https://raw.githubusercontent.com/vitalibo/git-lfs/master/readme.md&name=self.svg)
 
 <details> 
 <summary>SVG code</summary>
